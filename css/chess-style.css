@@ -1,0 +1,68 @@
+#time1,#time2, #iWillPlay{display: none}
+.miscalculation{ min-height: 100px; display: none; flex-direction: column; justify-content: space-between;}
+.miscalculation-flex {display: flex; }
+.variant{display: flex; align-items: center;}
+.variant-line{margin-left: 10px;}
+.variant-eval{font-weight: 600; width: 30px; display: flex; justify-content: flex-end;} 
+.togglers {display: flex; margin-top: 25px; align-items: center;}
+.togglers button {display: flex; justify-content: center; align-items: center;}
+.engineDepth {display: flex; margin-top: 20px;}
+.engineDepth input {width: 50px;}
+#positionInfo{display: none;}
+#engineToggler{cursor: pointer;}
+#threatsToggler, #engineToggler{ font-size: 18px; color: gray; margin-right: 10px;}
+#threatsToggler:hover{color: red !important;}
+#engineToggler:hover, .active{color: #629924 !important;}
+.flex{display:flex}
+.settings{min-width:350px}
+#board{max-width:calc(100% - 350px)}
+.settings > .form-group{margin:20px 0}
+.form-group > div > input{margin-left:10px}
+.settings{margin-left:20px}
+input[name="color"]{margin-right:5px}
+@media(max-width: 850px) {
+.board--{flex-wrap:wrap-reverse}
+.board-- > *{flex:none!important;width:100%}
+.settings{margin:0;text-align:center;display:flex;flex-direction:column;align-items:center}
+.settings .flex{justify-content:center;display:inline-flex}
+.settings > .form-group{margin:10px 0}
+}
+.no-scroll{overflow-y:hidden}
+#hintForMove{font-weight:700}
+.grayhint{color: #505050;font-size: 14px}
+
+
+#colorfulEvaluation{position:relative;width:20px;display:flex;flex-direction:column;border:2px solid #555;border-radius:10px;overflow:hidden;box-sizing:border-box}
+#colorfulEvaluation::before{display:block;content:'';position:absolute;top:0;left:0;right:0;height:calc(50% - 2px);border-bottom:4px solid red;z-index:100}
+#blackevaluation{background-color:#000;box-sizing:border-box;border-bottom:1px solid #555;}
+#whiteevaluation{background-color:#fff;box-sizing:border-box;border-top:1px solid #555;}
+#blackevaluation,#whiteevaluation{transition:.5s;flex-shrink: 1;flex-basis: 0%; flex: 1;}
+@media(max-width: 850px) {
+#colorfulEvaluation{flex-direction:row;width:100%;height:20px;margin-bottom:10px}
+#colorfulEvaluation::before{width:50%;border-right:4px solid red;left:0;height:100%}
+#blackevaluation,#whiteevaluation{border:0}
+#blackevaluation{border-right:1px solid #555}
+#whiteevaluation{border-left:1px solid #555}
+}
+
+
+#board{width:100%;max-width:800px;margin:0 auto}
+#board > div > div > div > div{position:relative}
+#board > div > div > div > div:hover::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;border:1px solid rgba(0,0,0,0.9);box-sizing:border-box}
+.modal{overflow:hidden;position:fixed;top:0;left:100%;right:0;bottom:0;background-color:rgba(0,0,0,0.9);display:flex;justify-content:space-around;align-items:flex-start;padding-top:100px;z-index:10000000;transition:.3s;text-align:center;color:#fff;font-size:35px}
+.modal p{color:#fff;font-size:35px;font-family:monospace}
+.modal.replace-figure h1{margin:0 0 30px;color:#fff;font-weight:700}
+.modal.replace-figure ul{padding:0;margin:0;list-style:none}
+.modal.replace-figure a{color:#fff;font-size:20px}
+.modal.opened{left:0}
+.board--{display:flex}
+.board-- #board{flex:3}
+.board-- .settings{flex:1}
+.board-- #fen,.board-- #pgn{text-decoration:underline;cursor:pointer}
+.test-panel-link{font-family:cursive;font-size:20px;cursor:pointer;text-decoration:underline}
+.test-panel{display:inline-flex;flex-direction:column;transition:max-height 1s;max-height:0;overflow:hidden}
+.test-panel.opened{max-height:300px}
+.test-panel > *{font-family:monospace;font-size:20px;margin:0;cursor:pointer;border-left:3px solid #000;padding-left:20px;margin-bottom:5px}
+.test-panel > * > span.i{display:inline-block;width:25px;height:25px;background-color:#000;color:#fff;position:relative;text-align:center;border-radius:100%}
+.test-panel > * > span.i::after{position:fixed;content:attr(data-hint);background-color:#fff;color:#000;border-radius:10px;overflow:hidden;top:50%;left:50%;width:80%;max-height:0;transform:translate(-50%,-50%)}
+.test-panel > * > span.i:hover::after{max-height:40%;border:1px solid #000}

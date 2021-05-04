@@ -1,0 +1,188 @@
+<!doctype html>
+<html>
+
+<head>
+  <link rel="stylesheet" href="css/chessboard-0.3.0.min.css" />
+  <link rel="stylesheet" href="css/chess-style.css" />
+  <link rel="stylesheet" href="fontawesome-free/css/all.css" />
+  <script src="js/chess.js"></script>
+  <script src="js/jquery-1.10.1.min.js"></script>
+  <script src="js/chess.min.js"></script>
+  <script src="js/chessboard-0.3.0.min.js"></script>
+  <title>Stockfish.js</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+</head>
+
+<body>
+  <div class="board--">
+    <div id="board"></div>
+    <div id="colorfulEvaluation">
+      <div id="blackevaluation"></div>
+      <div id="whiteevaluation"></div>
+    </div>
+    <div class="settings">
+      <h3>Настройки : </h3>
+      <div id="pgn"></div>
+      <!-- form > #show score -->
+      <div class="flex form-group">
+        <label for="promote">Когда пешка дойдет до края превратить ее в </label>
+        <div style="margin-left: 5px">
+          <select id=promote>
+            <option value=q selected>Ферзя</option>
+            <option value=r>Ладью</option>
+            <option value=b>Слона</option>
+            <option value=n>Коня</option>
+          </select>
+        </div>
+      </div>
+      <!-- <div class="form-group">
+        
+        <div class="flex form-group">
+          <label for="timeDepth">Глубина просчета лучшего хода : </label>
+          <div>
+            <input type="number" max="5" min="1" step="1" class="form-control" id="timeDepth" value="1">
+          </div>
+        </div>
+        <div>Лучший ход : <span id="hintForMove"></span></div>
+      </div> -->
+      <!-- form > #timeBase -->
+      <div class="form-group" style="display: none">
+        <label for="timeBase">Base time (min)</label>
+        <div>
+          <input type="number" class="form-control" id="timeBase" min="1" value="5">
+        </div>
+      </div>
+      <!-- form > #timeInc -->
+      <div class="flex form-group">
+        <label for="timeInc">Максимальное время обумывания хода машиной (сек.)</label>
+        <div>
+          <input type="number" class="form-control" min="1" id="timeInc" value="2">
+        </div>
+      </div>
+
+      <!-- form > #skillLevel -->
+      <div class="flex form-group">
+        <label for="skillLevel">Уровень сложности соперника (0-20) <br /><span class="grayhint">*Влияет на просчет хода</span></label>
+        <div>
+          <input type="number" class="form-control" min="0" max="20" id="skillLevel" value="20">
+        </div>
+      </div>
+      <!-- form > #I play color -->
+      <div class="form-group" id="iWillPlay">
+        <label for="color">Я буду играть </label>
+        <div class="btn-group" data-toggle="buttons">
+          <label class="btn btn-primary active" id="color-white"><input type="radio" name="color" checked>За белых</label>
+          <label class="btn btn-primary" id="color-black"><input type="radio" name="color">За черных</label>
+        </div>
+      </div>
+      <!-- form > #show score -->
+      <div class="flex form-group">
+        <label for="showScore">Отображать результат</label>
+        <div>
+          <input type="checkbox" class="form-control" id="showScore" checked>
+        </div>
+      </div>
+      <!-- form > #show score -->
+      <div class="form-group">
+        <label for="color"></label>
+        <div>
+          <button type="button" class="btn btn-primary" onclick="newGame()">Начать новую игру</button>
+        </div>
+        <div class="engineDepth">
+          <label for="engineDepth">Depth:</label>
+          <input type="number" min="1" max="infinite" value="16" id="engineDepth">
+        </div>
+        <div class="togglers">
+          <button id="threatsToggler" ><i title="Показывать угрозы"  class="fas fa-exclamation-circle"></i></button>
+          <button id="engineToggler"><i title="Показывать просчёты движка" class="fas fa-search"></i></button>
+          <span id="positionInfo">Stockfish 11 <span id="positionEval"></span> depth = <span id="positionDepth"></span></span>
+        </div>
+      </div>
+      <div class="miscalculation">
+        <div class="variant">
+          <span id="variantEval_1" class="variant-eval"></span>
+          <div>
+            <span id="variantLine_1" class="variant-line"></span> 
+          </div>
+        </div>
+        <div class="variant">
+          <span id="variantEval_2" class="variant-eval"></span>
+          <div>
+            <span id="variantLine_2" class="variant-line"></span> 
+          </div> 
+        </div>
+        <div class="variant">
+          <span id="variantEval_3" class="variant-eval"></span>
+          <div>
+            <span id="variantLine_3" class="variant-line"></span> 
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="debug-info">
+    <span class="h3" id="time1">0:05:00</span>
+    <span class="h3" id="time2">0:05:00</span>
+    <pre id="evaluation"></pre>
+    <div id="engineStatus">...</div>
+  </div>
+
+  <script src="enginegame.js"></script>
+  <script>
+    var newBest = false,
+      bestmove;
+
+    var wait_for_script;
+    var newGame = function() {};
+
+    /// We can load Stockfish.js via Web Workers or directly via a <script> tag.
+    /// Web Workers are better since they don't block the UI, but they are not always avaiable.
+    (function fix_workers() {
+      var script_tag;
+      /// Does the environment support web workers?  If not, include stockfish.js directly.
+      ///NOTE: Since web workers don't work when a page is loaded from the local system, we have to fake it there too. (Take that security measures!)
+      if (!Worker || (location && location.protocol === "file:")) {
+        var script_tag = document.createElement("script");
+        script_tag.type = "text/javascript";
+        script_tag.src = "stockfish.asm.js";
+        script_tag.onload = init;
+        document.getElementsByTagName("head")[0].appendChild(script_tag);
+        wait_for_script = true;
+      }
+    }());
+    var game;
+
+    function init() {
+      game = engineGame();
+
+      newGame = function newGame() {
+        var baseTime = parseFloat($('#timeBase').val()) * 60;
+        var inc = parseFloat($('#timeInc').val());
+        var skill = parseInt($('#skillLevel').val());
+        game.reset();
+        game.setTime(baseTime, inc);
+        game.setSkillLevel(skill);
+        game.setPlayerColor($('#color-white').hasClass('active') ? 'white' : 'black');
+        game.setDisplayScore($('#showScore').is(':checked'));
+        game.start();
+      }
+
+      game.setSkillLevel
+
+      document.getElementById("skillLevel").addEventListener("change", function() {
+        game.setSkillLevel(parseInt(this.value, 10));
+      });
+
+      newGame();
+    }
+
+    /// If we load Stockfish.js via a <script> tag, we need to wait until it loads.
+    if (!wait_for_script) {
+      document.addEventListener("DOMContentLoaded", init);
+    }
+  </script>
+  <div id="fictBoard" style="display: none"></div>
+</body>
+
+</html>
