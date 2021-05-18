@@ -272,6 +272,8 @@ function engineGame(options) {
 
       if (!game.game_over() && engineActive) {
 
+        uciCmd('stop')
+
         if (threatsActive) {
           uciCmd('position fen ' + swapTurn());
           uciCmd('position fen ' + swapTurn(), evaler)
@@ -654,11 +656,13 @@ function engineGame(options) {
           console.log(line_1);
 
           // вывод оценки варианта в линии
-          if (score == '0') { 
+          if (Number.isInteger(score) && score != 0) { 
+            $('#variantEval_' + j).text(line_1[0] > 0 ? '+' + String(line_1[0]) + '.0' : line_1[0])
+          } else if (score == 0) {
             $('#variantEval_' + j).text('0.0')
           } else {
             $('#variantEval_' + j).text(line_1[0] > 0 ? '+' + line_1[0] : line_1[0]);
-          }        
+          }          
           
           // вывод оценки, если движок нашел мат
           if (variants[8] == 'mate' && j == 1) { 
@@ -683,7 +687,7 @@ function engineGame(options) {
             line_predictions_1.reset() // сбросить до стартовой позиции виртуальную доску
           }
 
-          if (threatsActive) { // если включен режим Угроз, то "передать ход" черным принудительным преобразованием FEN'a (замена w на b и наоборот)
+          if (threatsActive) { // если включен режим Угроз, то "передать ход" принудительным преобразованием FEN'a (замена w на b и наоборот)
             let tokens = game.fen().split(" ");
             tokens[1] = game.turn() === "b" ? "w" : "b";
             tokens[3] = "-";
@@ -770,11 +774,13 @@ function engineGame(options) {
           console.log(line_1);
 
           // вывод оценки варианта в линии
-          if (score == '0') { 
+          if (Number.isInteger(score) && score != 0) { 
+            $('#variantEval_' + j).text(line_1[0] > 0 ? '+' + String(line_1[0]) + '.0' : line_1[0])
+          } else if (score == 0) {
             $('#variantEval_' + j).text('0.0')
           } else {
             $('#variantEval_' + j).text(line_1[0] > 0 ? '+' + line_1[0] : line_1[0]);
-          }        
+          }         
           
           // вывод оценки, если движок нашел мат
           if (variants[8] == 'mate' && j == 1) { 
